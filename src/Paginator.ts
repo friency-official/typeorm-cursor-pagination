@@ -120,7 +120,7 @@ export default class Paginator<Entity> {
     }
 
     builder.take(this.limit + 1);
-    builder.orderBy(this.buildOrder());
+    this.buildOrder(builder);
 
     return builder;
   }
@@ -148,7 +148,7 @@ export default class Paginator<Entity> {
     return '=';
   }
 
-  private buildOrder(): OrderByCondition {
+  private buildOrder(queryBuilder: SelectQueryBuilder<Entity>): OrderByCondition {
     let { order } = this;
 
     if (!this.hasAfterCursor() && this.hasBeforeCursor()) {
@@ -157,7 +157,8 @@ export default class Paginator<Entity> {
 
     const orderByCondition: OrderByCondition = {};
     this.paginationKeys.forEach((key) => {
-      orderByCondition[`${this.alias}.${key}`] = order;
+      queryBuilder.addOrderBy(`${this.alias}.${key}`, order);
+      //   orderByCondition[`${this.alias}.${key}`] = order;
     });
 
     return orderByCondition;
